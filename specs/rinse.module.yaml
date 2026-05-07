@@ -1,0 +1,67 @@
+module: rinse
+name: Reflective Integrative Neural Self-Evolver
+version: 0.0.1
+status: experimental
+
+summary: >
+  Reflective interpretation layer over trace and memory substrates. Reads
+  experience traces, filters noise, detects emotional and causal patterns,
+  produces structured insights. Never mutates source traces.
+
+invariant: |
+  RINSE may forget an interpretation.
+  RINSE must never erase the trace that made the interpretation possible.
+
+boundary:
+  reads_from:
+    - t-trace
+    - ttm
+    - liminaldb
+  writes_to:
+    - rinse-derived-store
+  must_not:
+    - mutate source traces
+    - delete source traces
+    - call external LLM APIs in v0
+
+pipeline:
+  - ingest
+  - noise_filter
+  - signal_detection
+  - emotion_tagging
+  - causal_pattern_extraction
+  - insight_synthesis
+  - clarity_scoring
+  - next_step_suggestion
+  - persist_derived_record
+
+inputs:
+  trace_event:
+    id: string
+    ts: iso8601
+    actor: enum[human, agent, system]
+    kind: enum[utterance, action, observation, state]
+    text: string
+    context: object
+
+outputs:
+  interpretation_record:
+    id: string
+    source_trace_ids: list[string]
+    emotions: list[string]
+    signals: list[string]
+    causal_links: list[object]
+    insight: string
+    clarity: float
+    next_step: string
+    produced_at: iso8601
+
+dependencies:
+  python: ">=3.9"
+  packages: []
+
+non_goals_v0:
+  - llm_api_calls
+  - external_dependencies
+  - source_trace_mutation
+  - cross_actor_identity_resolution

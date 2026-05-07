@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rinse"
+version = "0.0.1"
+description = "Reflective Integrative Neural Self-Evolver: derived interpretation layer over trace and memory substrates."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "safal207" }
+]
+keywords = ["memory", "traces", "interpretability", "agentic-ai", "causal-memory"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/safal207/rinse"
+Repository = "https://github.com/safal207/rinse"
+
+[project.scripts]
+rinse-core = "rinse.core:main"
+rinse-bridge = "rinse.bridge:main"
+
+[tool.setuptools]
+packages = ["rinse"]

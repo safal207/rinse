@@ -42,17 +42,52 @@ experience / trace
 ## Repository layout
 
 ```text
+rinse/
+  __init__.py
+  core.py
+  bridge.py
+
 docs/RINSE.md
 specs/rinse.module.yaml
-examples/rinse/rinse_core.py
-examples/rinse/memory_bridge.py
+examples/rinse/rinse_core.py          # compatibility wrapper
+examples/rinse/memory_bridge.py       # compatibility wrapper
 examples/rinse/sample_input.json
+tests/test_rinse_core.py
 ```
 
 ## Quick start
 
+Run the importable package module:
+
+```bash
+python -m rinse.core examples/rinse/sample_input.json
+```
+
+Write derived interpretations to JSONL:
+
+```bash
+python -m rinse.bridge examples/rinse/sample_input.json ./rinse_interpretations.jsonl
+```
+
+Compatibility wrappers are still available:
+
 ```bash
 python examples/rinse/rinse_core.py examples/rinse/sample_input.json
+python examples/rinse/memory_bridge.py examples/rinse/sample_input.json ./rinse_interpretations.jsonl
+```
+
+## Python API
+
+```python
+from rinse import interpret, run
+
+trace = {
+    "id": "trace-001",
+    "text": "I am anxious because the deadline is close.",
+}
+
+record = interpret(trace)
+records = run([trace])
 ```
 
 The first implementation is dependency-free Python. No LLM calls. No mutation

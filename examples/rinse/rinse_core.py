@@ -15,13 +15,27 @@ EMOTION_LEXICON = {
     "sadness": ["sad", "tired", "drained", "down", "lonely"],
     "anger": ["angry", "furious", "irritated", "annoyed"],
     "fear": ["anxious", "afraid", "scared", "worried", "nervous"],
-    "clarity": ["clearer", "clear", "focused", "finished", "done"],
-    "avoidance": ["avoid", "drop", "drops", "dropping", "procrastinate"],
+    "clarity": ["clear", "clearer", "focused", "finished", "done"],
+    "avoidance": ["avoid", "avoids", "avoided", "drop", "drops", "dropped", "dropping", "procrastinate"],
 }
 
 CAUSE_CUES = ("because", "so", "therefore", "since", "when")
 
+SIGNAL_PATTERNS = {
+    "deadline_pressure": ["deadline", "deadlines"],
+    "planning": ["spec", "specs", "plan", "plans", "planning"],
+    "incomplete_followthrough": ["drop", "drops", "dropped", "dropping"],
+    "sleep_state": ["sleep", "sleeping", "slept"],
+}
+
 NOISE_TOKEN_RE = re.compile(r"^[a-z]{2,}$")
+
+
+def _has_word(text, words):
+    if not words:
+        return False
+    pattern = r"\b(?:" + "|".join(re.escape(w) for w in words) + r")\b"
+    return re.search(pattern, text, re.IGNORECASE) is not None
 
 
 def filter_noise(trace):
@@ -38,26 +52,11 @@ def filter_noise(trace):
 
 
 def detect_signals(text):
-    lower = text.lower()
-    signals = []
-    if "deadline" in lower:
-        signals.append("deadline_pressure")
-    if "spec" in lower or "plan" in lower:
-        signals.append("planning")
-    if "drop" in lower or "drops" in lower or "dropping" in lower:
-        signals.append("incomplete_followthrough")
-    if "slept" in lower or "sleep" in lower:
-        signals.append("sleep_state")
-    return signals
+    return [name for name, words in SIGNAL_PATTERNS.items() if _has_word(text, words)]
 
 
 def tag_emotions(text):
-    lower = text.lower()
-    found = []
-    for label, words in EMOTION_LEXICON.items():
-        if any(w in lower for w in words):
-            found.append(label)
-    return found
+    return [label for label, words in EMOTION_LEXICON.items() if _has_word(text, words)]
 
 
 def extract_causal_links(text):

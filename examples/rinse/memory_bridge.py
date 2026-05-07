@@ -8,8 +8,13 @@ the caller.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Iterable, Iterator, Protocol
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from rinse_core import filter_noise, interpret  # noqa: E402
 
 
 class TraceSource(Protocol):
@@ -51,3 +56,27 @@ def bridge(source: TraceSource, sink: InterpretationSink, interpret_fn) -> int:
         sink.write(record)
         count += 1
     return count
+
+
+def _interpret_or_skip(trace):
+    if not filter_noise(trace):
+        return None
+    return interpret(trace)
+
+
+def main(argv):
+    if len(argv) < 3:
+        print(
+            "usage: memory_bridge.py <input.json> <output.jsonl>",
+            file=sys.stderr,
+        )
+        return 2
+    source = JsonFileTraceSource(argv[1])
+    sink = JsonLinesInterpretationSink(argv[2])
+    written = bridge(source, sink, _interpret_or_skip)
+    print(f"wrote {written} interpretation record(s) to {argv[2]}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

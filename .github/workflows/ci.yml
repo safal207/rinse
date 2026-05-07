@@ -13,9 +13,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Compile examples
-        run: python -m compileall examples
+      - name: Compile package and examples
+        run: python -m compileall rinse examples
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
-      - name: Smoke test reference pipeline
+      - name: Smoke test package core
+        run: python -m rinse.core examples/rinse/sample_input.json
+      - name: Smoke test compatibility wrapper
         run: python examples/rinse/rinse_core.py examples/rinse/sample_input.json

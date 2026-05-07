@@ -1,81 +1,22 @@
-"""Read-only adapter interface between RINSE and an underlying trace store.
-
-The bridge never writes to or mutates the source substrate. Derived
-interpretation records are persisted to a separate RINSE store passed in by
-the caller.
-"""
+"""Compatibility wrapper for the importable RINSE bridge package."""
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
-from typing import Iterable, Iterator, Protocol
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-from rinse_core import filter_noise, interpret  # noqa: E402
-
-
-class TraceSource(Protocol):
-    def read_traces(self) -> Iterable[dict]:
-        ...
-
-
-class InterpretationSink(Protocol):
-    def write(self, record: dict) -> None:
-        ...
-
-
-class JsonFileTraceSource:
-    def __init__(self, path: str | Path) -> None:
-        self._path = Path(path)
-
-    def read_traces(self) -> Iterator[dict]:
-        data = json.loads(self._path.read_text(encoding="utf-8"))
-        for trace in data.get("traces", []):
-            yield trace
-
-
-class JsonLinesInterpretationSink:
-    def __init__(self, path: str | Path) -> None:
-        self._path = Path(path)
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-
-    def write(self, record: dict) -> None:
-        with self._path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
-
-
-def bridge(source: TraceSource, sink: InterpretationSink, interpret_fn) -> int:
-    count = 0
-    for trace in source.read_traces():
-        record = interpret_fn(trace)
-        if record is None:
-            continue
-        sink.write(record)
-        count += 1
-    return count
-
-
-def _interpret_or_skip(trace):
-    if not filter_noise(trace):
-        return None
-    return interpret(trace)
-
-
-def main(argv):
-    if len(argv) < 3:
-        print(
-            "usage: memory_bridge.py <input.json> <output.jsonl>",
-            file=sys.stderr,
-        )
-        return 2
-    source = JsonFileTraceSource(argv[1])
-    sink = JsonLinesInterpretationSink(argv[2])
-    written = bridge(source, sink, _interpret_or_skip)
-    print(f"wrote {written} interpretation record(s) to {argv[2]}")
-    return 0
+from rinse.bridge import (  # noqa: E402,F401
+    InterpretationSink,
+    JsonFileTraceSource,
+    JsonLinesInterpretationSink,
+    TraceSource,
+    bridge,
+    main,
+)
 
 
 if __name__ == "__main__":

@@ -44,9 +44,12 @@ experience / trace
 ```text
 docs/RINSE.md
 specs/rinse.module.yaml
+schemas/interpretation_record.schema.json
 examples/rinse/rinse_core.py
 examples/rinse/memory_bridge.py
 examples/rinse/sample_input.json
+examples/rinse/expected_output_shape.json
+tests/test_rinse_core.py
 ```
 
 ## Quick start
@@ -55,8 +58,21 @@ examples/rinse/sample_input.json
 python examples/rinse/rinse_core.py examples/rinse/sample_input.json
 ```
 
+For a stable contract example, see:
+
+```text
+examples/rinse/expected_output_shape.json
+schemas/interpretation_record.schema.json
+```
+
 The first implementation is dependency-free Python. No LLM calls. No mutation
 of source traces. Only derived interpretation records are written.
+
+## Tests
+
+```bash
+python -m unittest discover -s tests -v
+```
 
 ## Status
 

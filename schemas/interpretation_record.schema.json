@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/interpretation_record.schema.json",
+  "title": "RINSE Interpretation Record",
+  "description": "A derived, reversible interpretation record produced by RINSE from immutable source traces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "source_trace_ids",
+    "emotions",
+    "signals",
+    "causal_links",
+    "insight",
+    "clarity",
+    "next_step",
+    "produced_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^rinse-[a-zA-Z0-9_-]+$",
+      "description": "Stable identifier for this derived interpretation record."
+    },
+    "source_trace_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Back-references to immutable source trace ids. RINSE must not mutate those traces."
+    },
+    "emotions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Coarse affective labels detected from the trace text."
+    },
+    "signals": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Salient structural or behavioral signals detected by the pipeline."
+    },
+    "causal_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cause", "effect"],
+        "properties": {
+          "cause": { "type": "string", "minLength": 1 },
+          "effect": { "type": "string", "minLength": 1 }
+        }
+      },
+      "description": "Cause/effect hints extracted from the source trace. These are provisional interpretations, not source truth."
+    },
+    "insight": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short synthesized interpretation."
+    },
+    "clarity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Support score for the interpretation based on available signals."
+    },
+    "next_step": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One concrete suggested follow-up."
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when RINSE produced the interpretation record."
+    }
+  }
+}

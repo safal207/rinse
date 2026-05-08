@@ -1,0 +1,36 @@
+{
+  "interpretations": [
+    {
+      "id": "rinse-<generated>",
+      "source_trace_ids": ["trace-001"],
+      "emotions": ["sadness"],
+      "signals": ["incomplete_followthrough", "sleep_state"],
+      "causal_links": [
+        {
+          "cause": "I slept badly",
+          "effect": "I keep starting projects and dropping them. I am tired today"
+        }
+      ],
+      "insight": "emotional tone: sadness; signals: incomplete_followthrough, sleep_state; pattern: I slept badly -> I keep starting projects and dropping them. I am tired today",
+      "clarity": 1.0,
+      "next_step": "treat today as a recovery day; defer judgment of progress",
+      "produced_at": "<date-time>"
+    },
+    {
+      "id": "rinse-<generated>",
+      "source_trace_ids": ["trace-002"],
+      "emotions": ["clarity"],
+      "signals": ["planning"],
+      "causal_links": [
+        {
+          "cause": "I wrote the spec first",
+          "effect": "the work felt clearer and I finished it"
+        }
+      ],
+      "insight": "emotional tone: clarity; signals: planning; pattern: I wrote the spec first -> the work felt clearer and I finished it",
+      "clarity": 1.0,
+      "next_step": "reuse the spec-first pattern on the next task",
+      "produced_at": "<date-time>"
+    }
+  ]
+}

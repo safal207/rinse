@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/trace_event.schema.json",
+  "title": "RINSE Trace Event",
+  "description": "Minimal normalized trace event shape accepted by the RINSE v0 reference pipeline.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "text"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable source trace identifier. RINSE stores this as a back-reference and must not mutate the source trace."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional timestamp for the source trace event."
+    },
+    "actor": {
+      "type": "string",
+      "enum": ["human", "agent", "system"],
+      "description": "Optional actor category that produced the trace event."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["utterance", "action", "observation", "state"],
+      "description": "Optional source event kind."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable content interpreted by the RINSE pipeline."
+    },
+    "context": {
+      "type": "object",
+      "description": "Optional source-specific metadata carried through by adapters."
+    }
+  }
+}

@@ -32,4 +32,4 @@ rinse-core = "rinse.core:main"
 rinse-bridge = "rinse.bridge:main"
 
 [tool.setuptools]
-packages = ["rinse"]
+packages = ["rinse", "rinse.adapters"]

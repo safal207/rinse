@@ -24,6 +24,9 @@ RINSE must never erase the trace that made the interpretation possible.
 
 This is the only hard rule. Everything else is policy.
 
+For the philosophical framing behind this rule, see
+[`PHILOSOPHY.md`](PHILOSOPHY.md).
+
 ## Pipeline
 
 The reference pipeline is intentionally small and synchronous.

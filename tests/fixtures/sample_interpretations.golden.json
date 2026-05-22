@@ -21,9 +21,14 @@
       "source_trace_ids": ["trace-002"],
       "emotions": ["clarity"],
       "signals": ["planning"],
-      "causal_links": [],
-      "insight": "emotional tone: clarity; signals: planning",
-      "clarity": 0.4,
+      "causal_links": [
+        {
+          "cause": "I wrote the spec first",
+          "effect": "the work felt clearer and I finished it"
+        }
+      ],
+      "insight": "emotional tone: clarity; signals: planning; pattern: I wrote the spec first -> the work felt clearer and I finished it",
+      "clarity": 1.0,
       "next_step": "reuse the spec-first pattern on the next task",
       "produced_at": "<generated>"
     },

@@ -54,13 +54,18 @@ experience / trace
 ## Repository layout
 
 ```text
+rinse/
+  __init__.py
+  core.py
+  bridge.py
+
 docs/RINSE.md
 docs/PHILOSOPHY.md
 specs/rinse.module.yaml
 schemas/trace_event.schema.json
 schemas/interpretation_record.schema.json
-examples/rinse/rinse_core.py
-examples/rinse/memory_bridge.py
+examples/rinse/rinse_core.py          # compatibility wrapper
+examples/rinse/memory_bridge.py       # compatibility wrapper
 examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
 tests/test_rinse_core.py
@@ -68,8 +73,37 @@ tests/test_rinse_core.py
 
 ## Quick start
 
+Run the importable package module:
+
+```bash
+python -m rinse.core examples/rinse/sample_input.json
+```
+
+Write derived interpretations to JSONL:
+
+```bash
+python -m rinse.bridge examples/rinse/sample_input.json ./rinse_interpretations.jsonl
+```
+
+Compatibility wrappers are still available:
+
 ```bash
 python examples/rinse/rinse_core.py examples/rinse/sample_input.json
+python examples/rinse/memory_bridge.py examples/rinse/sample_input.json ./rinse_interpretations.jsonl
+```
+
+## Python API
+
+```python
+from rinse import interpret, run
+
+trace = {
+    "id": "trace-001",
+    "text": "I am anxious because the deadline is close.",
+}
+
+record = interpret(trace)
+records = run([trace])
 ```
 
 For stable contract examples, see:
@@ -86,7 +120,9 @@ of source traces. Only derived interpretation records are written.
 ## Tests
 
 ```bash
+python -m compileall rinse examples
 python -m unittest discover -s tests -v
+python -m rinse.core examples/rinse/sample_input.json
 ```
 
 ## Status

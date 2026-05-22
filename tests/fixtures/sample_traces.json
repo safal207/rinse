@@ -1,0 +1,36 @@
+{
+  "traces": [
+    {
+      "id": "trace-001",
+      "ts": "2026-05-07T09:14:02Z",
+      "actor": "human",
+      "kind": "utterance",
+      "text": "I keep starting projects and dropping them. I am tired today because I slept badly.",
+      "context": {"channel": "journal"}
+    },
+    {
+      "id": "trace-002",
+      "ts": "2026-05-07T09:14:30Z",
+      "actor": "human",
+      "kind": "utterance",
+      "text": "When I wrote the spec first, the work felt clearer and I finished it.",
+      "context": {"channel": "journal"}
+    },
+    {
+      "id": "trace-003",
+      "ts": "2026-05-07T09:15:10Z",
+      "actor": "human",
+      "kind": "utterance",
+      "text": "asdfgh",
+      "context": {"channel": "journal"}
+    },
+    {
+      "id": "trace-004",
+      "ts": "2026-05-07T09:16:00Z",
+      "actor": "human",
+      "kind": "utterance",
+      "text": "I am anxious because the deadline is close, so I avoid opening the editor.",
+      "context": {"channel": "journal"}
+    }
+  ]
+}

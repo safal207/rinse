@@ -1,0 +1,4 @@
+{"id":"trace-jsonl-001","ts":"2026-05-07T10:00:00Z","actor":"human","kind":"utterance","text":"I am anxious because the deadline is close.","context":{"channel":"jsonl"}}
+{"trace_id":"trace-jsonl-002","timestamp":"2026-05-07T10:01:00Z","actor":"agent","type":"observation","message":"The spec is clear so the work can continue.","context":{"channel":"jsonl"}}
+
+{"event_id":"trace-jsonl-003","timestamp":"2026-05-07T10:02:00Z","actor":"system","type":"state","content":"asdfgh","context":{"channel":"jsonl"}}

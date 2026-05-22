@@ -27,6 +27,12 @@ This is the only hard rule. Everything else is policy.
 For the philosophical framing behind this rule, see
 [`PHILOSOPHY.md`](PHILOSOPHY.md).
 
+For the architectural decisions behind this rule, see:
+
+- [`adr/001-trace-immutability.md`](adr/001-trace-immutability.md)
+- [`adr/002-deterministic-first-pipeline.md`](adr/002-deterministic-first-pipeline.md)
+- [`adr/003-optional-llm-synthesis-boundary.md`](adr/003-optional-llm-synthesis-boundary.md)
+
 ## Pipeline
 
 The reference pipeline is intentionally small and synchronous.

@@ -22,6 +22,13 @@ from .bridge import (
     TraceSource,
     bridge,
 )
+from .validation import (
+    ValidationError,
+    validate_interpretation_record,
+    validate_interpretation_records,
+    validate_trace_event,
+    validate_trace_events,
+)
 
 __all__ = [
     "detect_signals",
@@ -38,4 +45,9 @@ __all__ = [
     "JsonFileTraceSource",
     "JsonLinesInterpretationSink",
     "bridge",
+    "ValidationError",
+    "validate_trace_event",
+    "validate_trace_events",
+    "validate_interpretation_record",
+    "validate_interpretation_records",
 ]

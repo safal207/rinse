@@ -65,6 +65,7 @@ rinse/
 
 docs/RINSE.md
 docs/PHILOSOPHY.md
+docs/integrations/liminaldb-reader-sketch.md
 specs/rinse.module.yaml
 schemas/trace_event.schema.json
 schemas/interpretation_record.schema.json
@@ -72,6 +73,7 @@ examples/rinse/rinse_core.py          # compatibility wrapper
 examples/rinse/memory_bridge.py       # compatibility wrapper
 examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
+examples/rinse/liminaldb_export_sample.json
 tests/fixtures/sample_traces.json
 tests/fixtures/sample_interpretations.golden.json
 tests/fixtures/sample_ttrace.jsonl
@@ -155,6 +157,13 @@ records = run(list(source.read_traces()))
 The adapter reads JSONL line by line, skips blank lines, normalizes common field
 names such as `id` / `trace_id` / `event_id` and `text` / `message` / `content`,
 and never writes to the source file.
+
+## LiminalDB / Mirror Timeline sketch
+
+RINSE can also sit above LiminalDB / Mirror Timeline-style memory exports as a
+read-only interpretation layer. See
+[`docs/integrations/liminaldb-reader-sketch.md`](docs/integrations/liminaldb-reader-sketch.md)
+and [`examples/rinse/liminaldb_export_sample.json`](examples/rinse/liminaldb_export_sample.json).
 
 For stable contract examples, see:
 

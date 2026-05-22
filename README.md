@@ -68,7 +68,10 @@ examples/rinse/rinse_core.py          # compatibility wrapper
 examples/rinse/memory_bridge.py       # compatibility wrapper
 examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
+tests/fixtures/sample_traces.json
+tests/fixtures/sample_interpretations.golden.json
 tests/test_rinse_core.py
+tests/test_golden_outputs.py
 ```
 
 ## Quick start
@@ -124,6 +127,17 @@ python -m compileall rinse examples
 python -m unittest discover -s tests -v
 python -m rinse.core examples/rinse/sample_input.json
 ```
+
+## Golden-output workflow
+
+Golden-output tests lock down deterministic interpretation behavior. They
+normalize generated fields such as `id` and `produced_at`, then compare stable
+fields like emotions, signals, causal links, insight, clarity, next step, and
+source trace ids.
+
+Only update `tests/fixtures/sample_interpretations.golden.json` when a pipeline
+change intentionally changes interpretation behavior. Generated fields should
+remain represented as `<generated>`.
 
 ## Status
 

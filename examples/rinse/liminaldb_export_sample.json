@@ -1,0 +1,27 @@
+{
+  "timeline_id": "mirror-timeline-demo",
+  "records": [
+    {
+      "memory_id": "mem-001",
+      "created_at": "2026-05-07T12:00:00Z",
+      "speaker": "human",
+      "event_kind": "utterance",
+      "body": "I am anxious because the deadline is close.",
+      "metadata": {
+        "channel": "journal",
+        "project": "RINSE"
+      }
+    },
+    {
+      "memory_id": "mem-002",
+      "created_at": "2026-05-07T12:05:00Z",
+      "speaker": "agent",
+      "event_kind": "observation",
+      "body": "When the spec is written first, the next action is easier to choose.",
+      "metadata": {
+        "channel": "reflection",
+        "project": "RINSE"
+      }
+    }
+  ]
+}

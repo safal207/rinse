@@ -58,6 +58,7 @@ rinse/
   __init__.py
   core.py
   bridge.py
+  validation.py
   adapters/
     __init__.py
     ttrace_jsonl.py
@@ -77,6 +78,7 @@ tests/fixtures/sample_ttrace.jsonl
 tests/test_rinse_core.py
 tests/test_golden_outputs.py
 tests/test_ttrace_jsonl_adapter.py
+tests/test_validation.py
 ```
 
 ## Quick start
@@ -112,6 +114,30 @@ trace = {
 
 record = interpret(trace)
 records = run([trace])
+```
+
+## Structural validation
+
+RINSE includes dependency-free structural validation helpers for project-critical
+trace and interpretation fields. These helpers do not implement full JSON Schema
+validation; they provide lightweight checks for the reference pipeline.
+
+```python
+from rinse import (
+    validate_trace_event,
+    validate_interpretation_record,
+    interpret,
+)
+
+trace = {
+    "id": "trace-001",
+    "text": "I am anxious because the deadline is close.",
+    "context": {},
+}
+
+validate_trace_event(trace)
+record = interpret(trace)
+validate_interpretation_record(record)
 ```
 
 ## T-Trace JSONL adapter

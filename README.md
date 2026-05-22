@@ -25,6 +25,18 @@ RINSE may forget an interpretation.
 RINSE must never erase the trace that made the interpretation possible.
 ```
 
+## Philosophy
+
+RINSE is built on a simple distinction: traces are preserved evidence;
+interpretations are provisional readings.
+
+```text
+A trace is sacred. An interpretation is provisional.
+```
+
+For the philosophical boundary behind the project, see
+[`docs/PHILOSOPHY.md`](docs/PHILOSOPHY.md).
+
 ## Minimal pipeline
 
 ```text
@@ -43,6 +55,7 @@ experience / trace
 
 ```text
 docs/RINSE.md
+docs/PHILOSOPHY.md
 specs/rinse.module.yaml
 schemas/interpretation_record.schema.json
 examples/rinse/rinse_core.py

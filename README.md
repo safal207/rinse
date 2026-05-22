@@ -58,6 +58,9 @@ rinse/
   __init__.py
   core.py
   bridge.py
+  adapters/
+    __init__.py
+    ttrace_jsonl.py
 
 docs/RINSE.md
 docs/PHILOSOPHY.md
@@ -70,8 +73,10 @@ examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
 tests/fixtures/sample_traces.json
 tests/fixtures/sample_interpretations.golden.json
+tests/fixtures/sample_ttrace.jsonl
 tests/test_rinse_core.py
 tests/test_golden_outputs.py
+tests/test_ttrace_jsonl_adapter.py
 ```
 
 ## Quick start
@@ -108,6 +113,22 @@ trace = {
 record = interpret(trace)
 records = run([trace])
 ```
+
+## T-Trace JSONL adapter
+
+RINSE includes a read-only adapter for T-Trace-style JSONL streams:
+
+```python
+from rinse import run
+from rinse.adapters import TTraceJsonLinesSource
+
+source = TTraceJsonLinesSource("tests/fixtures/sample_ttrace.jsonl")
+records = run(list(source.read_traces()))
+```
+
+The adapter reads JSONL line by line, skips blank lines, normalizes common field
+names such as `id` / `trace_id` / `event_id` and `text` / `message` / `content`,
+and never writes to the source file.
 
 For stable contract examples, see:
 

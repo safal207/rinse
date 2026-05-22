@@ -43,6 +43,42 @@ class CausalLinkTests(unittest.TestCase):
         self.assertEqual(links[0]["cause"], "I slept badly")
         self.assertEqual(links[0]["effect"], "I am tired")
 
+    def test_because_with_punctuation_creates_causal_link(self):
+        text = "I am tired, because I slept badly."
+        links = extract_causal_links(text)
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0]["cause"], "I slept badly")
+        self.assertEqual(links[0]["effect"], "I am tired")
+
+    def test_leading_when_creates_causal_link(self):
+        text = "When I wrote the spec first, the work felt clearer and I finished it."
+        links = extract_causal_links(text)
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0]["cause"], "I wrote the spec first")
+        self.assertEqual(links[0]["effect"], "the work felt clearer and I finished it")
+
+    def test_multiple_cues_are_returned_in_source_order(self):
+        text = "I am anxious because the deadline is close, so I avoid opening the editor."
+        links = extract_causal_links(text)
+        self.assertEqual(
+            links,
+            [
+                {
+                    "cause": "the deadline is close, so I avoid opening the editor",
+                    "effect": "I am anxious",
+                },
+                {
+                    "cause": "I am anxious because the deadline is close",
+                    "effect": "I avoid opening the editor",
+                },
+            ],
+        )
+
+    def test_cue_words_inside_other_words_do_not_match(self):
+        text = "The software thereforeware build is done."
+        links = extract_causal_links(text)
+        self.assertEqual(links, [])
+
 
 class SignalAndEmotionTests(unittest.TestCase):
     def test_deadline_anxious_yields_pressure_and_fear(self):

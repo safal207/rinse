@@ -35,6 +35,10 @@ EMOTION_LEXICON = {
 }
 
 CAUSE_CUES = ("because", "so", "therefore", "since", "when")
+CAUSE_CUE_RE = re.compile(
+    r"\b(" + "|".join(re.escape(cue) for cue in CAUSE_CUES) + r")\b",
+    re.IGNORECASE,
+)
 
 SIGNAL_PATTERNS = {
     "deadline_pressure": ["deadline", "deadlines"],
@@ -76,20 +80,49 @@ def tag_emotions(text: str) -> list[str]:
     return [label for label, words in EMOTION_LEXICON.items() if _has_word(text, words)]
 
 
+def _clean_fragment(fragment: str) -> str:
+    return fragment.strip(" \t\n\r.,;:")
+
+
+def _split_leading_when(text: str, cue_end: int) -> tuple[str, str] | None:
+    remainder = text[cue_end:].strip()
+    parts = re.split(r"[,;:]\s*", remainder, maxsplit=1)
+    if len(parts) != 2:
+        return None
+    cause = _clean_fragment(parts[0])
+    effect = _clean_fragment(parts[1])
+    if not cause or not effect:
+        return None
+    return cause, effect
+
+
 def extract_causal_links(text: str) -> list[dict[str, str]]:
+    """Extract deterministic cause/effect hints from explicit cue words.
+
+    Supported cues are matched on word boundaries in source order. This avoids
+    matching cue substrings inside unrelated words such as "software". Leading
+    "when" clauses use the pattern "When <cause>, <effect>"; non-leading
+    "when" clauses use "<effect> when <cause>".
+    """
+
     links = []
-    lower = text.lower()
-    for cue in CAUSE_CUES:
-        idx = lower.find(f" {cue} ")
-        if idx == -1:
-            continue
-        left = text[:idx].strip(" .,;:")
-        right = text[idx + len(cue) + 2 :].strip(" .,;:")
-        if left and right:
-            if cue in ("because", "since"):
-                links.append({"cause": right, "effect": left})
-            else:
-                links.append({"cause": left, "effect": right})
+    for match in CAUSE_CUE_RE.finditer(text):
+        cue = match.group(1).lower()
+        left = _clean_fragment(text[: match.start()])
+        right = _clean_fragment(text[match.end() :])
+
+        if cue == "when" and not left:
+            split = _split_leading_when(text, match.end())
+            if split is None:
+                continue
+            cause, effect = split
+        elif cue in ("because", "since", "when"):
+            cause, effect = right, left
+        else:
+            cause, effect = left, right
+
+        if cause and effect:
+            links.append({"cause": cause, "effect": effect})
     return links
 
 

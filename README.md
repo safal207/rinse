@@ -66,6 +66,7 @@ rinse/
 docs/RINSE.md
 docs/PHILOSOPHY.md
 docs/integrations/liminaldb-reader-sketch.md
+docs/integrations/cml-drp-evidence-linking.md
 specs/rinse.module.yaml
 schemas/trace_event.schema.json
 schemas/interpretation_record.schema.json
@@ -74,6 +75,7 @@ examples/rinse/memory_bridge.py       # compatibility wrapper
 examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
 examples/rinse/liminaldb_export_sample.json
+examples/rinse/cml_drp_evidence_example.json
 tests/fixtures/sample_traces.json
 tests/fixtures/sample_interpretations.golden.json
 tests/fixtures/sample_ttrace.jsonl
@@ -164,6 +166,13 @@ RINSE can also sit above LiminalDB / Mirror Timeline-style memory exports as a
 read-only interpretation layer. See
 [`docs/integrations/liminaldb-reader-sketch.md`](docs/integrations/liminaldb-reader-sketch.md)
 and [`examples/rinse/liminaldb_export_sample.json`](examples/rinse/liminaldb_export_sample.json).
+
+## CML / DRP evidence-linking example
+
+RINSE can link derived interpretations back to CML / DRP-style evidence without
+owning or rewriting that evidence. See
+[`docs/integrations/cml-drp-evidence-linking.md`](docs/integrations/cml-drp-evidence-linking.md)
+and [`examples/rinse/cml_drp_evidence_example.json`](examples/rinse/cml_drp_evidence_example.json).
 
 For stable contract examples, see:
 

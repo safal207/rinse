@@ -1,0 +1,50 @@
+{
+  "source_evidence": {
+    "id": "evidence-001",
+    "ts": "2026-05-07T12:00:00Z",
+    "actor": "agent",
+    "kind": "decision",
+    "decision": "HOLD",
+    "reason": "missing human confirmation",
+    "permitted_by": "policy-human-review-required",
+    "parent_cause": "trace-user-request-001",
+    "text": "The action was held because human confirmation was missing.",
+    "context": {
+      "source": "cml-drp",
+      "cml_record_id": "cml-001",
+      "drp_decision_id": "drp-001"
+    }
+  },
+  "normalized_rinse_trace": {
+    "id": "evidence-001",
+    "ts": "2026-05-07T12:00:00Z",
+    "actor": "agent",
+    "kind": "decision",
+    "text": "The action was held because human confirmation was missing.",
+    "context": {
+      "source": "cml-drp",
+      "decision": "HOLD",
+      "reason": "missing human confirmation",
+      "permitted_by": "policy-human-review-required",
+      "parent_cause": "trace-user-request-001",
+      "cml_record_id": "cml-001",
+      "drp_decision_id": "drp-001"
+    }
+  },
+  "derived_rinse_interpretation": {
+    "id": "rinse-example-001",
+    "source_trace_ids": ["evidence-001"],
+    "emotions": [],
+    "signals": [],
+    "causal_links": [
+      {
+        "cause": "human confirmation was missing",
+        "effect": "The action was held"
+      }
+    ],
+    "insight": "pattern: human confirmation was missing -> The action was held",
+    "clarity": 0.6,
+    "next_step": "note the trace and revisit tomorrow",
+    "produced_at": "2026-05-07T12:00:01Z"
+  }
+}

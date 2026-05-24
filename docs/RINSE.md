@@ -32,6 +32,21 @@ For the architectural decisions behind this rule, see:
 - [`adr/001-trace-immutability.md`](adr/001-trace-immutability.md)
 - [`adr/002-deterministic-first-pipeline.md`](adr/002-deterministic-first-pipeline.md)
 - [`adr/003-optional-llm-synthesis-boundary.md`](adr/003-optional-llm-synthesis-boundary.md)
+- [`adr/004-relational-interpretation.md`](adr/004-relational-interpretation.md)
+
+## Relational interpretation
+
+RINSE is not emotional intelligence. It is relational interpretation.
+
+It helps reveal what became significant between a subject and an object.
+
+```text
+Subject -> Object -> Relation -> Trace -> Significance -> Interpretation -> Action
+```
+
+Emotion can be part of the signal, but it is not the sovereign authority over
+meaning. RINSE proposes accountable readings of preserved traces; it does not
+replace human meaning-making.
 
 ## Pipeline
 

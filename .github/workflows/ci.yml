@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, agent/rinse-reflection-graph-v0.2]
   pull_request:
 
 jobs:
@@ -21,3 +21,28 @@ jobs:
         run: python -m rinse.core examples/rinse/sample_input.json
       - name: Smoke test compatibility wrapper
         run: python examples/rinse/rinse_core.py examples/rinse/sample_input.json
+      - name: Validate reflection schemas are JSON
+        run: |
+          python -m json.tool schemas/reflection_record.schema.json >/dev/null
+          python -m json.tool schemas/reflection_graph.schema.json >/dev/null
+      - name: Prove deterministic reflection graph output
+        run: |
+          python -m rinse.reflection_graph \
+            examples/rinse/trace_reinterpretation_v0.2.json \
+            --output /tmp/reflection-first.json
+          python -m rinse.reflection_graph \
+            examples/rinse/trace_reinterpretation_v0.2.json \
+            --output /tmp/reflection-second.json
+          cmp /tmp/reflection-first.json /tmp/reflection-second.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          graph = json.loads(Path('/tmp/reflection-first.json').read_text())
+          assert graph['verdict'] == 'ACCEPT_WITH_LIMITS'
+          assert len(graph['active_interpretation_ids']) == 1
+          assert all(not item['execution_allowed'] for item in graph['candidate_handoffs'])
+          assert graph['authority']['truth_authorized'] is False
+          assert graph['authority']['execution_authorized'] is False
+          print('RINSE_REFLECTION_GRAPH_PASS')
+          PY

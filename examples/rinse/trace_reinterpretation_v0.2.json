@@ -1,0 +1,110 @@
+{
+  "records": [
+    {
+      "authority": {
+        "classification": "REFLECTION_ONLY",
+        "evidence_mutation_authorized": false,
+        "execution_authorized": false,
+        "source_trace_mutation_authorized": false,
+        "truth_authorized": false
+      },
+      "confidence": 0.38,
+      "digest": "sha256:15fd4244f6a3556de2a9b56df5a95d19f70edffb8d7ca972bdb97f28b1a2e0d6",
+      "evidence_relations": [
+        {
+          "ref": "kairos:causal-gap:C10",
+          "type": "CONTRADICTED_BY"
+        },
+        {
+          "ref": "paper:trace:functional-enrichment",
+          "type": "SUPPORTED_BY"
+        }
+      ],
+      "id": "rinse-reflection-0da22d3107fa06af",
+      "interpretation_relations": [],
+      "missing_evidence": [
+        "cellular effect",
+        "expression change",
+        "fitness advantage",
+        "organism phenotype"
+      ],
+      "proposed_transition": {
+        "execution_allowed": false,
+        "kind": "REINTERPRETATION_CANDIDATE",
+        "status": "CANDIDATE",
+        "target_state": "re-evaluate adaptive-benefit interpretation"
+      },
+      "recorded_time": "2026-07-31T09:00:00Z",
+      "reviewed_time": "2026-07-31T09:05:00Z",
+      "schema": "rinse.reflection-record.v0.2",
+      "source_trace_ids": [
+        "trace:adaptive-overclaim",
+        "trace:functional-enrichment"
+      ],
+      "statement": "Archaic regions near immune genes establish adaptive benefit.",
+      "status": "CONTESTED",
+      "subject_id": "trace-archaic-introgression-2026",
+      "valid_time": {
+        "from": "2026-07-31T09:00:00Z"
+      }
+    },
+    {
+      "authority": {
+        "classification": "REFLECTION_ONLY",
+        "evidence_mutation_authorized": false,
+        "execution_authorized": false,
+        "source_trace_mutation_authorized": false,
+        "truth_authorized": false
+      },
+      "confidence": 0.84,
+      "digest": "sha256:c842b3331ce8fee6bfe9173a5b78696293dc7efecd78fdfe1c011e696bf79578",
+      "evidence_relations": [
+        {
+          "ref": "claim:established-adaptive-benefit",
+          "type": "CONTRADICTED_BY"
+        },
+        {
+          "ref": "kairos:ACCEPT_WITH_LIMITS",
+          "type": "SUPPORTED_BY"
+        },
+        {
+          "ref": "proofpath:C10",
+          "type": "SUPPORTED_BY"
+        }
+      ],
+      "id": "rinse-reflection-3ccf02613a8af2d2",
+      "interpretation_relations": [
+        {
+          "target_id": "rinse-reflection-0da22d3107fa06af",
+          "type": "SUPERSEDES"
+        }
+      ],
+      "missing_evidence": [
+        "cellular effect",
+        "expression change",
+        "fitness advantage",
+        "organism phenotype"
+      ],
+      "proposed_transition": {
+        "execution_allowed": false,
+        "kind": "REINTERPRETATION_CANDIDATE",
+        "status": "CANDIDATE",
+        "target_state": "retain functional association and request missing causal evidence"
+      },
+      "recorded_time": "2026-07-31T09:10:00Z",
+      "reviewed_time": "2026-07-31T09:15:00Z",
+      "schema": "rinse.reflection-record.v0.2",
+      "source_trace_ids": [
+        "trace:adaptive-overclaim",
+        "trace:functional-enrichment",
+        "trace:kairos-verdict"
+      ],
+      "statement": "Functional enrichment is an association; adaptive causality remains unresolved.",
+      "status": "SUPPORTED_WITH_LIMITS",
+      "subject_id": "trace-archaic-introgression-2026",
+      "valid_time": {
+        "from": "2026-07-31T09:10:00Z"
+      }
+    }
+  ]
+}

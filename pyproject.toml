@@ -31,6 +31,7 @@ Repository = "https://github.com/safal207/rinse"
 rinse-core = "rinse.core:main"
 rinse-bridge = "rinse.bridge:main"
 rinse-reflect = "rinse.reflection_graph:main"
+rinse-kairos-loop = "rinse.adapters.kairos_liminal_receipt:main"
 
 [tool.setuptools]
 packages = ["rinse", "rinse.adapters"]

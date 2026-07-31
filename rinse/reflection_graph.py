@@ -39,6 +39,8 @@ class ReflectionGraphError(ValueError):
 
 
 def _canonical(value: Any) -> bytes:
+    """Serialize a value into stable canonical JSON bytes."""
+
     try:
         return json.dumps(
             value,
@@ -52,28 +54,38 @@ def _canonical(value: Any) -> bytes:
 
 
 def _sha256_ref(value: Any) -> str:
+    """Return a prefixed SHA-256 reference for canonical JSON content."""
+
     return "sha256:" + hashlib.sha256(_canonical(value)).hexdigest()
 
 
 def _mapping(value: Any, label: str) -> Mapping[str, Any]:
+    """Require and return an object-like mapping."""
+
     if not isinstance(value, Mapping):
         raise ReflectionGraphError(f"{label} must be an object")
     return value
 
 
 def _sequence(value: Any, label: str) -> Sequence[Any]:
+    """Require and return a non-string sequence."""
+
     if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
         raise ReflectionGraphError(f"{label} must be an array")
     return value
 
 
 def _text(value: Any, label: str) -> str:
+    """Require a non-empty string and normalize surrounding whitespace."""
+
     if not isinstance(value, str) or not value.strip():
         raise ReflectionGraphError(f"{label} must be a non-empty string")
     return value.strip()
 
 
 def _iso_datetime(value: Any, label: str) -> datetime:
+    """Parse a timezone-aware ISO-8601 date-time."""
+
     text = _text(value, label)
     try:
         parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
@@ -85,6 +97,8 @@ def _iso_datetime(value: Any, label: str) -> datetime:
 
 
 def _unique_sorted_strings(values: Iterable[Any], label: str) -> list[str]:
+    """Normalize an iterable into sorted unique non-empty strings."""
+
     result: set[str] = set()
     for index, value in enumerate(values):
         result.add(_text(value, f"{label}[{index}]"))
@@ -92,6 +106,8 @@ def _unique_sorted_strings(values: Iterable[Any], label: str) -> list[str]:
 
 
 def _normalized_evidence_relations(values: Iterable[Any]) -> list[dict[str, Any]]:
+    """Validate, deduplicate, and deterministically order evidence relations."""
+
     normalized: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
     for index, raw in enumerate(values):
@@ -123,6 +139,8 @@ def _normalized_evidence_relations(values: Iterable[Any]) -> list[dict[str, Any]
 
 
 def _normalized_interpretation_relations(values: Iterable[Any]) -> list[dict[str, str]]:
+    """Validate and order links between versioned interpretations."""
+
     normalized: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
     for index, raw in enumerate(values):
@@ -148,6 +166,8 @@ def _normalized_interpretation_relations(values: Iterable[Any]) -> list[dict[str
 
 
 def _authority_boundary() -> dict[str, Any]:
+    """Return the immutable reflection-only authority boundary."""
+
     return {
         "classification": "REFLECTION_ONLY",
         "source_trace_mutation_authorized": False,
@@ -158,6 +178,8 @@ def _authority_boundary() -> dict[str, Any]:
 
 
 def _candidate_transition(target_state: str) -> dict[str, Any]:
+    """Build a non-executable reinterpretation candidate for Kairos review."""
+
     return {
         "kind": "REINTERPRETATION_CANDIDATE",
         "target_state": _text(target_state, "proposed_target_state"),
@@ -244,10 +266,18 @@ def create_reflection_record(
 
 
 def _semantic_body(record: Mapping[str, Any]) -> dict[str, Any]:
-    return {key: deepcopy(value) for key, value in record.items() if key not in {"id", "digest"}}
+    """Return the digest-bearing record body without generated identity fields."""
+
+    return {
+        key: deepcopy(value)
+        for key, value in record.items()
+        if key not in {"id", "digest"}
+    }
 
 
 def validate_reflection_record(value: Any) -> None:
+    """Validate one reflection record and its authority boundaries."""
+
     record = _mapping(value, "reflection")
     expected_fields = {
         "schema",
@@ -375,6 +405,8 @@ def validate_reflection_record(value: Any) -> None:
 
 
 def _detect_cycles(index: Mapping[str, Mapping[str, Any]], relation_type: str) -> None:
+    """Reject cycles in a chosen interpretation-relation subgraph."""
+
     adjacency: dict[str, list[str]] = {record_id: [] for record_id in index}
     for record_id, record in index.items():
         for relation in record["interpretation_relations"]:
@@ -385,6 +417,8 @@ def _detect_cycles(index: Mapping[str, Mapping[str, Any]], relation_type: str) -
     visited: set[str] = set()
 
     def walk(node: str) -> None:
+        """Depth-first walk that detects a back edge."""
+
         if node in visiting:
             raise ReflectionGraphError(f"{relation_type} cycle detected at {node}")
         if node in visited:
@@ -400,6 +434,8 @@ def _detect_cycles(index: Mapping[str, Mapping[str, Any]], relation_type: str) -
 
 
 def validate_reflection_graph(records: Sequence[Any]) -> None:
+    """Validate record references, chronology, subjects, and graph acyclicity."""
+
     if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
         raise ReflectionGraphError("records must be an array")
     index: dict[str, Mapping[str, Any]] = {}
@@ -523,6 +559,8 @@ def build_reflection_graph(records: Sequence[Any]) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run the fail-closed command-line graph builder."""
+
     parser = argparse.ArgumentParser(description="Build a RINSE v0.2 reflection graph")
     parser.add_argument("input", type=Path)
     parser.add_argument("--output", type=Path)
@@ -532,7 +570,12 @@ def main(argv: list[str] | None = None) -> int:
         payload = json.loads(args.input.read_text(encoding="utf-8"))
         records = _sequence(_mapping(payload, "input").get("records"), "records")
         graph = build_reflection_graph(records)
-    except (OSError, json.JSONDecodeError, ReflectionGraphError) as exc:
+    except (
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        ReflectionGraphError,
+    ) as exc:
         print(f"BLOCK: {exc}")
         return 2
 

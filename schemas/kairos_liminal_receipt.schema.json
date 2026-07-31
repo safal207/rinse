@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/kairos_liminal_receipt.schema.json",
+  "title": "Pinned Kairos LiminalDB Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "case_id",
+    "source",
+    "code_pins",
+    "trace_file_pins",
+    "evidence_digests",
+    "workflow_artifact_id",
+    "replay",
+    "authority"
+  ],
+  "properties": {
+    "schema": { "const": "rinse.kairos-liminal-receipt.v0.1" },
+    "case_id": { "const": "trace-archaic-introgression-2026" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kairos_repository",
+        "kairos_pull_request",
+        "kairos_commit",
+        "trace_package_commit",
+        "liminaldb_repository",
+        "liminaldb_commit"
+      ],
+      "properties": {
+        "kairos_repository": { "type": "string", "minLength": 1 },
+        "kairos_pull_request": { "type": "integer", "minimum": 1 },
+        "kairos_commit": { "$ref": "#/$defs/sha40" },
+        "trace_package_commit": { "$ref": "#/$defs/sha40" },
+        "liminaldb_repository": { "type": "string", "minLength": 1 },
+        "liminaldb_commit": { "$ref": "#/$defs/sha40" }
+      }
+    },
+    "code_pins": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/filePin" }
+    },
+    "trace_file_pins": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "path", "git_blob_sha"],
+        "properties": {
+          "role": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "git_blob_sha": { "$ref": "#/$defs/sha40" }
+        }
+      }
+    },
+    "evidence_digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/sha256Ref" }
+    },
+    "workflow_artifact_id": { "type": "integer", "minimum": 1 },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "source_verdict",
+        "event_count_before_reopen",
+        "event_count_after_reopen",
+        "snapshot_event_count",
+        "projection_count",
+        "projection_equal_after_reopen",
+        "final_side_effect_committed",
+        "adds_scientific_verdict",
+        "final_dimensions"
+      ],
+      "properties": {
+        "verdict": { "type": "string", "minLength": 1 },
+        "source_verdict": { "type": "string", "minLength": 1 },
+        "event_count_before_reopen": { "type": "integer", "minimum": 0 },
+        "event_count_after_reopen": { "type": "integer", "minimum": 0 },
+        "snapshot_event_count": { "type": "integer", "minimum": 0 },
+        "projection_count": { "type": "integer", "minimum": 0 },
+        "projection_equal_after_reopen": { "type": "boolean" },
+        "final_side_effect_committed": { "type": "boolean" },
+        "adds_scientific_verdict": { "type": "boolean" },
+        "final_dimensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "authority",
+            "execution",
+            "response_integrity",
+            "causal_validity",
+            "continuity_posture"
+          ],
+          "properties": {
+            "authority": { "type": "string" },
+            "execution": { "type": "string" },
+            "response_integrity": { "type": "string" },
+            "causal_validity": { "type": "string" },
+            "continuity_posture": { "type": "string" }
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "source_mutation_authorized",
+        "scientific_truth_authorized",
+        "causal_authorization",
+        "execution_authorized",
+        "deployment_authorized",
+        "merge_authorized"
+      ],
+      "properties": {
+        "classification": { "type": "string" },
+        "source_mutation_authorized": { "const": false },
+        "scientific_truth_authorized": { "const": false },
+        "causal_authorization": { "const": false },
+        "execution_authorized": { "const": false },
+        "deployment_authorized": { "const": false },
+        "merge_authorized": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "sha40": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256Ref": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "filePin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "git_blob_sha"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "git_blob_sha": { "$ref": "#/$defs/sha40" }
+      }
+    }
+  }
+}

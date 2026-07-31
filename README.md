@@ -62,24 +62,32 @@ rinse/
   adapters/
     __init__.py
     ttrace_jsonl.py
+  career/
+    __init__.py
+    pipeline.py
 
 docs/RINSE.md
 docs/PHILOSOPHY.md
+docs/CAREER_RINSE.md
 docs/integrations/liminaldb-reader-sketch.md
 docs/integrations/cml-drp-evidence-linking.md
 specs/rinse.module.yaml
 schemas/trace_event.schema.json
 schemas/interpretation_record.schema.json
+schemas/career_trace_event.schema.json
 examples/rinse/rinse_core.py          # compatibility wrapper
 examples/rinse/memory_bridge.py       # compatibility wrapper
+examples/rinse/career_rinse.py
 examples/rinse/sample_input.json
 examples/rinse/expected_output_shape.json
+examples/rinse/career_traces_sample.json
 examples/rinse/liminaldb_export_sample.json
 examples/rinse/cml_drp_evidence_example.json
 tests/fixtures/sample_traces.json
 tests/fixtures/sample_interpretations.golden.json
 tests/fixtures/sample_ttrace.jsonl
 tests/test_rinse_core.py
+tests/test_career_rinse.py
 tests/test_golden_outputs.py
 tests/test_ttrace_jsonl_adapter.py
 tests/test_validation.py
@@ -97,6 +105,12 @@ Write derived interpretations to JSONL:
 
 ```bash
 python -m rinse.bridge examples/rinse/sample_input.json ./rinse_interpretations.jsonl
+```
+
+Run the Career RINSE example:
+
+```bash
+python examples/rinse/career_rinse.py examples/rinse/career_traces_sample.json
 ```
 
 Compatibility wrappers are still available:
@@ -119,6 +133,29 @@ trace = {
 record = interpret(trace)
 records = run([trace])
 ```
+
+## Career RINSE
+
+Career RINSE turns fragmented career-history traces into evidence-backed,
+provisional interpretations, public-safe portfolio cases, and a redacted
+warm-contact queue.
+
+```python
+import json
+from pathlib import Path
+
+from rinse.career import run_career_rinse
+
+payload = json.loads(
+    Path("examples/rinse/career_traces_sample.json").read_text(encoding="utf-8")
+)
+result = run_career_rinse(payload["traces"])
+```
+
+The module never mutates the source traces and never authorizes automatic
+outreach. Every contact suggestion sets `execution_allowed` to `false` and
+`requires_human_review` to `true`. See
+[`docs/CAREER_RINSE.md`](docs/CAREER_RINSE.md).
 
 ## Structural validation
 
@@ -179,7 +216,9 @@ For stable contract examples, see:
 ```text
 schemas/trace_event.schema.json
 schemas/interpretation_record.schema.json
+schemas/career_trace_event.schema.json
 examples/rinse/expected_output_shape.json
+examples/rinse/career_traces_sample.json
 ```
 
 The first implementation is dependency-free Python. No LLM calls. No mutation

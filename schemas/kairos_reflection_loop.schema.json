@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/kairos_reflection_loop.schema.json",
+  "title": "RINSE Kairos Reflection Loop Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "case_id",
+    "source_receipt_digest",
+    "upstream",
+    "upstream_evidence_digests",
+    "reflection_graph",
+    "active_reflection_id",
+    "kairos_handoff",
+    "authority",
+    "digest"
+  ],
+  "properties": {
+    "schema": { "const": "rinse.kairos-reflection-loop.v0.1" },
+    "case_id": { "const": "trace-archaic-introgression-2026" },
+    "source_receipt_digest": { "$ref": "#/$defs/sha256Ref" },
+    "upstream": { "type": "object", "minProperties": 1 },
+    "upstream_evidence_digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/sha256Ref" }
+    },
+    "reflection_graph": { "$ref": "reflection_graph.schema.json" },
+    "active_reflection_id": {
+      "type": "string",
+      "pattern": "^rinse-reflection-[0-9a-f]{16}$"
+    },
+    "kairos_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reflection_id",
+        "kind",
+        "target_state",
+        "status",
+        "execution_allowed"
+      ],
+      "properties": {
+        "reflection_id": {
+          "type": "string",
+          "pattern": "^rinse-reflection-[0-9a-f]{16}$"
+        },
+        "kind": { "const": "REINTERPRETATION_CANDIDATE" },
+        "target_state": { "type": "string", "minLength": 1 },
+        "status": { "const": "CANDIDATE" },
+        "execution_allowed": { "const": false }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "source_mutation_authorized",
+        "scientific_truth_authorized",
+        "causal_authorization",
+        "execution_authorized",
+        "deployment_authorized",
+        "merge_authorized"
+      ],
+      "properties": {
+        "classification": { "const": "REFLECTION_ONLY" },
+        "source_mutation_authorized": { "const": false },
+        "scientific_truth_authorized": { "const": false },
+        "causal_authorization": { "const": false },
+        "execution_authorized": { "const": false },
+        "deployment_authorized": { "const": false },
+        "merge_authorized": { "const": false }
+      }
+    },
+    "digest": { "$ref": "#/$defs/sha256Ref" }
+  },
+  "$defs": {
+    "sha256Ref": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

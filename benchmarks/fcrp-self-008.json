@@ -1,0 +1,109 @@
+{
+  "schema": "rinse.fcrp-case.v0.1",
+  "caseId": "FCRP-SELF-008",
+  "title": "Domain interpretation fork vs shared reflection authority",
+  "scope": {
+    "nodeId": "rinse-career-interpretation-authority",
+    "scale": "domain-adapter/core-reflection-contract/repository-topology",
+    "idea": "RINSE should have one evidence-bound interpretation semantics; domain modules may project it but must not create competing interpretation authority."
+  },
+  "timeline": {
+    "past": {
+      "summary": "Reflection Graph v0.2 was developed in the stacked #21 -> #20 -> #23 branch chain while main still exposed the older core."
+    },
+    "present": {
+      "summary": "Career RINSE #24 was developed separately from main and introduced its own provisional interpretation object with independent IDs/confidence fields, while the reflection graph defined versioned records, evidence relations, missing evidence and authority semantics."
+    },
+    "future": {
+      "summary": "The reflection graph is the sole semantic authority; Career consumes it as a domain adapter and exposes convenience projections bound to reflection_record_id."
+    }
+  },
+  "evidence": [
+    {
+      "id": "E1",
+      "kind": "core-branch",
+      "ref": "rinse/reflection_graph.py@1ecdf2d704f120d15b8ee458573043bbef4e717b",
+      "claim": "Reflection Graph v0.2 defines versioned record identity, evidence/status compatibility, temporal fields, missing evidence and REFLECTION_ONLY non-executable authority."
+    },
+    {
+      "id": "E2",
+      "kind": "domain-branch",
+      "ref": "rinse/career/pipeline.py@cefd55efb6991ef837fc07720fcaf67fec6b6f45",
+      "claim": "Career v0.1 independently derived provisional interpretation objects with separate IDs and confidence semantics."
+    },
+    {
+      "id": "E3",
+      "kind": "repository-topology",
+      "ref": "RINSE PR #23",
+      "claim": "The #21 -> #20 -> #23 chain is now consolidated into one promotion surface directly against main."
+    },
+    {
+      "id": "E4",
+      "kind": "refactor",
+      "ref": "rinse/career/pipeline.py@agent/career-rinse-v0-2",
+      "claim": "Career v0.2 creates shared reflection records first and derives its career-friendly interpretation view from those exact record IDs."
+    },
+    {
+      "id": "E5",
+      "kind": "regression",
+      "ref": "tests/test_career_rinse.py@agent/career-rinse-v0-2",
+      "claim": "Tests bind Career projections to reflection_record_id and preserve core SUPPORTED/SUPPORTED_WITH_LIMITS/CONTESTED/INSUFFICIENT_EVIDENCE plus non-executable authority semantics."
+    }
+  ],
+  "causalPath": [
+    {
+      "id": "N1",
+      "level": "repository-topology",
+      "phase": "first-divergence",
+      "statement": "The new core interpretation contract remained in a stacked branch chain rather than becoming the single active base for later domain work.",
+      "evidenceRefs": ["E1", "E3"]
+    },
+    {
+      "id": "N2",
+      "level": "domain-model",
+      "phase": "parallel-evolution",
+      "statement": "Career RINSE evolved from main and necessarily invented a separate interpretation shape because the reflection contract was not its parent surface.",
+      "evidenceRefs": ["E2"]
+    },
+    {
+      "id": "N3",
+      "level": "system-semantics",
+      "phase": "symptom",
+      "statement": "Two active definitions of a RINSE interpretation can diverge in identity, evidence, status, time and authority semantics.",
+      "evidenceRefs": ["E1", "E2"]
+    },
+    {
+      "id": "N4",
+      "level": "domain-core-boundary",
+      "phase": "refactor",
+      "statement": "Consolidate the core promotion surface and make Career produce reflection_record.v0.2 records before generating any domain projection.",
+      "evidenceRefs": ["E3", "E4", "E5"]
+    }
+  ],
+  "divergence": {
+    "symptomPoint": "N3",
+    "firstMeaningfulDivergence": "N1",
+    "causePoint": "N1",
+    "selectedRefactorPoint": "N4",
+    "evidenceRefs": ["E1", "E2", "E3", "E4", "E5"]
+  },
+  "navigation": {
+    "direction": "UP",
+    "reason": "The duplicate domain semantics are explained by repository promotion topology rather than by one incorrect Career rule."
+  },
+  "refactor": {
+    "point": "N4",
+    "change": "Use one reflection-record authority; retain Career-only normalization, evidence classification, redaction, portfolio and contact projections; bind career interpretation views to reflection_record_id.",
+    "expectedEffect": "New RINSE domains can add adapters and views without multiplying interpretation contracts or authority semantics."
+  },
+  "verification": {
+    "local": "PASS_PENDING_CI",
+    "upward": "PASS_PENDING_CI",
+    "stopConditions": {
+      "parentInvariantsPreserved": true,
+      "crossBoundaryEffectsAbsent": true,
+      "causalExplanationComplete": true
+    }
+  },
+  "expectedProtocolDecision": "PASS"
+}

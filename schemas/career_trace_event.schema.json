@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/career_trace_event.schema.json",
+  "title": "Career RINSE Trace Event",
+  "description": "An immutable career-history trace consumed by Career RINSE.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "event_type",
+    "occurred_at",
+    "company",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "assignment_received",
+        "assignment_submitted",
+        "assignment_acknowledged",
+        "interview_invited",
+        "positive_feedback",
+        "hiring_paused",
+        "rejected",
+        "offer_received",
+        "outreach_sent",
+        "reply_received"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "company": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "summary": {
+      "type": "string"
+    },
+    "contact": {
+      "type": "string",
+      "description": "Optional internal contact value. Public output redacts it by default."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "locator": { "type": "string", "minLength": 1 }
+      }
+    },
+    "derived_from": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "contradicts": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

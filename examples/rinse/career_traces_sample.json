@@ -1,0 +1,46 @@
+{
+  "traces": [
+    {
+      "id": "career-example-001",
+      "event_type": "assignment_received",
+      "occurred_at": "2022-04-20T07:23:48Z",
+      "company": "Example Payments",
+      "role": "Senior QA Engineer",
+      "skills": ["test design", "risk analysis"],
+      "summary": "Received a test assignment covering requirement risks and a test plan.",
+      "contact": "recruiter@example.invalid",
+      "source": {
+        "kind": "gmail",
+        "locator": "gmail://message/example-001"
+      }
+    },
+    {
+      "id": "career-example-002",
+      "event_type": "assignment_acknowledged",
+      "occurred_at": "2022-04-22T10:00:00Z",
+      "company": "Example Payments",
+      "role": "Senior QA Engineer",
+      "skills": ["test design", "risk analysis"],
+      "summary": "The employer confirmed receipt of the completed assignment.",
+      "contact": "recruiter@example.invalid",
+      "source": {
+        "kind": "gmail",
+        "locator": "gmail://message/example-002"
+      }
+    },
+    {
+      "id": "career-example-003",
+      "event_type": "interview_invited",
+      "occurred_at": "2022-04-25T09:30:00Z",
+      "company": "Example Payments",
+      "role": "Senior QA Engineer",
+      "skills": ["test design", "risk analysis"],
+      "summary": "Invited to a follow-up interview after review of the assignment.",
+      "contact": "recruiter@example.invalid",
+      "source": {
+        "kind": "gmail",
+        "locator": "gmail://message/example-003"
+      }
+    }
+  ]
+}

@@ -12,6 +12,7 @@ on:
       - examples/rinse/trace_kairos_liminal_receipt.v0.1.json
       - schemas/kairos_liminal_receipt.schema.json
       - schemas/kairos_reflection_loop.schema.json
+      - schemas/reflection_graph.schema.json
       - tests/test_kairos_liminal_receipt_adapter.py
       - docs/KAIROS_REFLECTION_LOOP_V0_1.md
       - pyproject.toml
@@ -23,6 +24,7 @@ on:
       - examples/rinse/trace_kairos_liminal_receipt.v0.1.json
       - schemas/kairos_liminal_receipt.schema.json
       - schemas/kairos_reflection_loop.schema.json
+      - schemas/reflection_graph.schema.json
       - tests/test_kairos_liminal_receipt_adapter.py
       - docs/KAIROS_REFLECTION_LOOP_V0_1.md
       - pyproject.toml
@@ -53,16 +55,34 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install exact RINSE package
-        run: python -m pip install -e .
+      - name: Install exact RINSE package and test-only schema validator
+        run: |
+          python -m pip install -e .
+          python -m pip install 'jsonschema>=4.23,<5'
 
       - name: Run full regression suite
         run: python -m unittest discover -s tests -v
 
-      - name: Validate loop schemas are JSON
+      - name: Validate source receipt against schema
         run: |
-          python -m json.tool schemas/kairos_liminal_receipt.schema.json >/dev/null
-          python -m json.tool schemas/kairos_reflection_loop.schema.json >/dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from referencing import Registry, Resource
+
+          schema_dir = Path('schemas')
+          registry = Registry()
+          for path in schema_dir.glob('*.schema.json'):
+              contents = json.loads(path.read_text(encoding='utf-8'))
+              resource = Resource.from_contents(contents)
+              registry = registry.with_resource(contents['$id'], resource)
+
+          schema = json.loads((schema_dir / 'kairos_liminal_receipt.schema.json').read_text(encoding='utf-8'))
+          document = json.loads(Path('examples/rinse/trace_kairos_liminal_receipt.v0.1.json').read_text(encoding='utf-8'))
+          Draft202012Validator(schema, registry=registry).validate(document)
+          print('SOURCE_RECEIPT_SCHEMA_PASS')
+          PY
 
       - name: Verify exact upstream Git blobs
         run: |
@@ -140,6 +160,27 @@ jobs:
           python -m rinse.adapters.kairos_liminal_receipt \
             "$RECEIPT" --output .artifacts/loop-second.json
           cmp .artifacts/loop-first.json .artifacts/loop-second.json
+
+      - name: Validate generated loop against schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from referencing import Registry, Resource
+
+          schema_dir = Path('schemas')
+          registry = Registry()
+          for path in schema_dir.glob('*.schema.json'):
+              contents = json.loads(path.read_text(encoding='utf-8'))
+              resource = Resource.from_contents(contents)
+              registry = registry.with_resource(contents['$id'], resource)
+
+          schema = json.loads((schema_dir / 'kairos_reflection_loop.schema.json').read_text(encoding='utf-8'))
+          document = json.loads(Path('.artifacts/loop-first.json').read_text(encoding='utf-8'))
+          Draft202012Validator(schema, registry=registry).validate(document)
+          print('GENERATED_LOOP_SCHEMA_PASS')
+          PY
 
       - name: Enforce bounded loop result
         run: |

@@ -1,0 +1,103 @@
+{
+  "schema": "rinse.kairos-liminal-receipt.v0.1",
+  "case_id": "trace-archaic-introgression-2026",
+  "source": {
+    "kairos_repository": "safal207/Kairos-Gate-for-X-Cell",
+    "kairos_pull_request": 60,
+    "kairos_commit": "03dbc036513be236cd30e7542145a35b27d41fe7",
+    "trace_package_commit": "31959a573724d0fd7ef1ac620a47d46355797b2f",
+    "liminaldb_repository": "safal207/LiminalDB",
+    "liminaldb_commit": "b8cf0528187c6d3fac3b28dbb9e90f1a2fb740e7"
+  },
+  "code_pins": [
+    {
+      "path": ".github/workflows/trace-liminaldb-rust-replay.yml",
+      "git_blob_sha": "d1683ef0e1d0c7e346c53cb878a04762249af69f"
+    },
+    {
+      "path": "kairos_gate/trace_evidence_bridge.py",
+      "git_blob_sha": "8ba40e4257c3750d34a89e324c3adf7480c82fbb"
+    },
+    {
+      "path": "manifests/trace-evidence-package-pr55.v0.1.json",
+      "git_blob_sha": "e25e1d074a5c2bb16e5611283c3dd33a234e7074"
+    },
+    {
+      "path": "scripts/derive_trace_ecosystem_receipt.py",
+      "git_blob_sha": "437abd9537a44a58fa5d8b7fb0aa553293a35a3e"
+    },
+    {
+      "path": "tools/liminaldb_bridge/trace_ecosystem_replay.rs",
+      "git_blob_sha": "ce3b66178f937f603cd84ee44a598e3157a24fdb"
+    }
+  ],
+  "trace_file_pins": [
+    {
+      "role": "claim_map",
+      "path": "evidence/trace-archaic-introgression-2026/claim-map.v0.1.json",
+      "git_blob_sha": "589a1501af228237764878b30759424e0e1055b1"
+    },
+    {
+      "role": "causal_transition_map",
+      "path": "evidence/trace-archaic-introgression-2026/causal-transition-map.v0.1.json",
+      "git_blob_sha": "8a9221580483a3b2ce09a7d9e4046171bbbcf5e1"
+    },
+    {
+      "role": "disposition",
+      "path": "evidence/trace-archaic-introgression-2026/disposition.v0.1.json",
+      "git_blob_sha": "a19e1f50238d3598833045fbbd4bb6e4e423f889"
+    },
+    {
+      "role": "source_manifest",
+      "path": "evidence/trace-archaic-introgression-2026/source-manifest.v0.1.json",
+      "git_blob_sha": "a0de89d556dfb9dbca80a02844068206264338ff"
+    },
+    {
+      "role": "reproducibility_contract",
+      "path": "evidence/trace-archaic-introgression-2026/reproducibility-contract.v0.1.json",
+      "git_blob_sha": "1827d24bfcf4d85c9420ef75ba1a1032bea96155"
+    },
+    {
+      "role": "phase_compatibility",
+      "path": "evidence/trace-archaic-introgression-2026/phase-compatibility.v0.1.json",
+      "git_blob_sha": "45ffc0a36f935bfce2ecc0646c191edb8c1733bc"
+    }
+  ],
+  "evidence_digests": {
+    "source_ecosystem_receipt": "sha256:24fda69778ce488180e28ece2e6a893400092fbf872b0cc7850a87378dd98386",
+    "rust_replay_receipt": "sha256:412b378cabc62b08978bd38ff9b1b7a674f6eb3a6842ae076c358db4c0070a16",
+    "wal": "sha256:74167e0af526925859587cd6cb9cdb34b76f959d11935ecb0c57ba788318d6ed",
+    "snapshot_file": "sha256:39cf07f1b18151a75573a43d72fab4ab3ad2b2d2bbc83fc66b2418ca71376a9b",
+    "semantic_snapshot": "sha256:c73d9594c1553c4b85040ba8ba87e5afba937a2040d89ea151864b318e7b80aa",
+    "final_event": "sha256:e0b7a48ebd49d1b232b8ce0030b66f495f5cedfd5edea1c8100ff65f7d49a8a5",
+    "workflow_artifact": "sha256:96b48012c754df81b28134e15e3049740576a36536608d1a1e658acc217f80b3"
+  },
+  "workflow_artifact_id": 8787651246,
+  "replay": {
+    "verdict": "RUST_REPLAY_RECOVERED_REPORT_ONLY",
+    "source_verdict": "ACCEPT_WITH_LIMITS",
+    "event_count_before_reopen": 5,
+    "event_count_after_reopen": 5,
+    "snapshot_event_count": 5,
+    "projection_count": 1,
+    "projection_equal_after_reopen": true,
+    "final_side_effect_committed": false,
+    "adds_scientific_verdict": false,
+    "final_dimensions": {
+      "authority": "VALID",
+      "execution": "OBSERVED_EXECUTED",
+      "response_integrity": "VERIFIED",
+      "causal_validity": "NOT_EVALUATED",
+      "continuity_posture": "REPORT_ONLY"
+    }
+  },
+  "authority": {
+    "classification": "REFLECTION_SOURCE_ONLY",
+    "source_mutation_authorized": false,
+    "scientific_truth_authorized": false,
+    "causal_authorization": false,
+    "execution_authorized": false,
+    "deployment_authorized": false,
+    "merge_authorized": false
+  }
+}

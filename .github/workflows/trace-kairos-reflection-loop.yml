@@ -1,0 +1,282 @@
+name: TRACE Kairos RINSE Reflection Loop
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/trace-kairos-reflection-loop-v0.1
+    paths:
+      - .github/workflows/trace-kairos-reflection-loop.yml
+      - rinse/adapters/kairos_liminal_receipt.py
+      - rinse/adapters/__init__.py
+      - examples/rinse/trace_kairos_liminal_receipt.v0.1.json
+      - schemas/kairos_liminal_receipt.schema.json
+      - schemas/kairos_reflection_loop.schema.json
+      - schemas/reflection_graph.schema.json
+      - tests/test_kairos_liminal_receipt_adapter.py
+      - docs/KAIROS_REFLECTION_LOOP_V0_1.md
+      - pyproject.toml
+  pull_request:
+    paths:
+      - .github/workflows/trace-kairos-reflection-loop.yml
+      - rinse/adapters/kairos_liminal_receipt.py
+      - rinse/adapters/__init__.py
+      - examples/rinse/trace_kairos_liminal_receipt.v0.1.json
+      - schemas/kairos_liminal_receipt.schema.json
+      - schemas/kairos_reflection_loop.schema.json
+      - schemas/reflection_graph.schema.json
+      - tests/test_kairos_liminal_receipt_adapter.py
+      - docs/KAIROS_REFLECTION_LOOP_V0_1.md
+      - pyproject.toml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trace-kairos-rinse-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reflection-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+      RECEIPT: examples/rinse/trace_kairos_liminal_receipt.v0.1.json
+    steps:
+      - name: Checkout exact RINSE head
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Install exact RINSE package and test-only schema validator
+        run: |
+          python -m pip install -e .
+          python -m pip install 'jsonschema>=4.23,<5'
+
+      - name: Run full regression suite
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate source receipt against schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from referencing import Registry, Resource
+
+          schema_dir = Path('schemas')
+          registry = Registry()
+          for path in schema_dir.glob('*.schema.json'):
+              contents = json.loads(path.read_text(encoding='utf-8'))
+              resource = Resource.from_contents(contents)
+              registry = registry.with_resource(contents['$id'], resource)
+
+          schema = json.loads((schema_dir / 'kairos_liminal_receipt.schema.json').read_text(encoding='utf-8'))
+          document = json.loads(Path('examples/rinse/trace_kairos_liminal_receipt.v0.1.json').read_text(encoding='utf-8'))
+          Draft202012Validator(schema, registry=registry).validate(document)
+          print('SOURCE_RECEIPT_SCHEMA_PASS')
+          PY
+
+      - name: Verify exact upstream Git blobs
+        run: |
+          mkdir -p .artifacts
+          python - <<'PY'
+          import hashlib
+          import json
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          receipt = json.loads(Path('examples/rinse/trace_kairos_liminal_receipt.v0.1.json').read_text())
+          source = receipt['source']
+          reports = []
+
+          def download(url):
+              error = None
+              for attempt in range(4):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as response:
+                          return response.read()
+                  except Exception as exc:
+                      error = exc
+                      time.sleep(attempt + 1)
+              raise SystemExit(f'cannot download {url}: {error}')
+
+          def git_blob_sha(data):
+              return hashlib.sha1(f'blob {len(data)}\0'.encode('ascii') + data).hexdigest()
+
+          kairos_base = (
+              'https://raw.githubusercontent.com/'
+              f"{source['kairos_repository']}/{source['kairos_commit']}"
+          )
+          for item in receipt['code_pins']:
+              url = f"{kairos_base}/{item['path']}"
+              data = download(url)
+              actual = git_blob_sha(data)
+              if actual != item['git_blob_sha']:
+                  raise SystemExit(
+                      f"Git blob mismatch for {item['path']}: {actual} != {item['git_blob_sha']}"
+                  )
+              reports.append({'url': url, 'git_blob_sha': actual, 'bytes': len(data)})
+
+          trace_base = (
+              'https://raw.githubusercontent.com/'
+              f"{source['kairos_repository']}/{source['trace_package_commit']}"
+          )
+          for item in receipt['trace_file_pins']:
+              url = f"{trace_base}/{item['path']}"
+              data = download(url)
+              actual = git_blob_sha(data)
+              if actual != item['git_blob_sha']:
+                  raise SystemExit(
+                      f"TRACE Git blob mismatch for {item['role']}: {actual} != {item['git_blob_sha']}"
+                  )
+              reports.append({
+                  'role': item['role'],
+                  'url': url,
+                  'git_blob_sha': actual,
+                  'bytes': len(data),
+              })
+
+          Path('.artifacts/upstream-blob-verification.json').write_text(
+              json.dumps({'verified': reports}, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(f"UPSTREAM_GIT_BLOBS_PASS {len(reports)}")
+          PY
+
+      - name: Prove byte-deterministic reflection loop
+        run: |
+          mkdir -p .artifacts
+          python -m rinse.adapters.kairos_liminal_receipt \
+            "$RECEIPT" --output .artifacts/loop-first.json
+          python -m rinse.adapters.kairos_liminal_receipt \
+            "$RECEIPT" --output .artifacts/loop-second.json
+          cmp .artifacts/loop-first.json .artifacts/loop-second.json
+
+      - name: Validate generated loop against schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from referencing import Registry, Resource
+
+          schema_dir = Path('schemas')
+          registry = Registry()
+          for path in schema_dir.glob('*.schema.json'):
+              contents = json.loads(path.read_text(encoding='utf-8'))
+              resource = Resource.from_contents(contents)
+              registry = registry.with_resource(contents['$id'], resource)
+
+          schema = json.loads((schema_dir / 'kairos_reflection_loop.schema.json').read_text(encoding='utf-8'))
+          document = json.loads(Path('.artifacts/loop-first.json').read_text(encoding='utf-8'))
+          Draft202012Validator(schema, registry=registry).validate(document)
+          print('GENERATED_LOOP_SCHEMA_PASS')
+          PY
+
+      - name: Enforce bounded loop result
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          result = json.loads(Path('.artifacts/loop-first.json').read_text())
+          if result['schema'] != 'rinse.kairos-reflection-loop.v0.1':
+              raise SystemExit('loop schema mismatch')
+          graph = result['reflection_graph']
+          if graph['verdict'] != 'ACCEPT_WITH_LIMITS':
+              raise SystemExit('RINSE graph must remain ACCEPT_WITH_LIMITS')
+          if len(graph['active_interpretation_ids']) != 1:
+              raise SystemExit('RINSE must expose exactly one active interpretation')
+          handoff = result['kairos_handoff']
+          required_handoff = {
+              'kind': 'REINTERPRETATION_CANDIDATE',
+              'status': 'CANDIDATE',
+              'execution_allowed': False,
+          }
+          for key, expected in required_handoff.items():
+              if handoff.get(key) != expected:
+                  raise SystemExit(f'handoff boundary changed at {key}')
+          if 'unresolved-adaptive-causality' not in handoff['target_state']:
+              raise SystemExit('target state lost the unresolved causal boundary')
+          if any(
+              value is not False
+              for key, value in result['authority'].items()
+              if key.endswith('authorized')
+          ):
+              raise SystemExit('RINSE authority escalation detected')
+          checked_out = subprocess.check_output(
+              ['git', 'rev-parse', 'HEAD'], text=True
+          ).strip()
+          if checked_out != os.environ['EXACT_HEAD']:
+              raise SystemExit('workflow did not validate the exact RINSE head')
+          print('RINSE_KAIROS_REFLECTION_LOOP_PASS')
+          print('NON_EXECUTABLE_HANDOFF_PASS')
+          print('EXACT_HEAD_PASS')
+          PY
+
+      - name: Prove replay and blob tampering block
+        run: |
+          python - <<'PY'
+          import copy
+          import json
+          from pathlib import Path
+
+          source = json.loads(Path('examples/rinse/trace_kairos_liminal_receipt.v0.1.json').read_text())
+          replay = copy.deepcopy(source)
+          replay['replay']['final_side_effect_committed'] = True
+          Path('.artifacts/tampered-replay.json').write_text(
+              json.dumps(replay, indent=2) + '\n', encoding='utf-8'
+          )
+          blob = copy.deepcopy(source)
+          blob['code_pins'][0]['git_blob_sha'] = '0' * 40
+          Path('.artifacts/tampered-blob.json').write_text(
+              json.dumps(blob, indent=2) + '\n', encoding='utf-8'
+          )
+          PY
+          for name in replay blob; do
+            set +e
+            python -m rinse.adapters.kairos_liminal_receipt \
+              ".artifacts/tampered-$name.json" \
+              > ".artifacts/tampered-$name-result.txt" 2>&1
+            code=$?
+            set -e
+            cat ".artifacts/tampered-$name-result.txt"
+            test "$code" -eq 2
+            grep -q '^BLOCK:' ".artifacts/tampered-$name-result.txt"
+            if grep -q 'Traceback' ".artifacts/tampered-$name-result.txt"; then
+              echo "tamper path emitted a traceback"
+              exit 1
+            fi
+          done
+
+      - name: Build exact-head evidence digests
+        run: |
+          sha256sum \
+            "$RECEIPT" \
+            .artifacts/loop-first.json \
+            .artifacts/upstream-blob-verification.json \
+            > .artifacts/sha256.txt
+
+      - name: Upload exact-head loop receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: trace-kairos-rinse-loop-${{ env.EXACT_HEAD }}
+          path: |
+            .artifacts/loop-first.json
+            .artifacts/upstream-blob-verification.json
+            .artifacts/tampered-replay-result.txt
+            .artifacts/tampered-blob-result.txt
+            .artifacts/sha256.txt
+          if-no-files-found: error
+          retention-days: 30

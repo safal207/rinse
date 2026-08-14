@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rinse"
-version = "0.0.1"
-description = "Reflective Integrative Neural Self-Evolver: derived interpretation layer over trace and memory substrates."
+version = "0.2.0"
+description = "Reflective Integrative Neural Self-Evolver: derived interpretation and versioned reflection graphs over immutable traces."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
   { name = "safal207" }
 ]
-keywords = ["memory", "traces", "interpretability", "agentic-ai", "causal-memory"]
+keywords = ["memory", "traces", "interpretability", "agentic-ai", "causal-memory", "reflection-graph"]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Intended Audience :: Developers",
@@ -30,6 +30,8 @@ Repository = "https://github.com/safal207/rinse"
 [project.scripts]
 rinse-core = "rinse.core:main"
 rinse-bridge = "rinse.bridge:main"
+rinse-reflect = "rinse.reflection_graph:main"
+rinse-kairos-loop = "rinse.adapters.kairos_liminal_receipt:main"
 
 [tool.setuptools]
 packages = ["rinse", "rinse.adapters"]

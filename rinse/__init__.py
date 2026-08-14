@@ -22,6 +22,19 @@ from .bridge import (
     TraceSource,
     bridge,
 )
+from .reflection_graph import (
+    EFFECTIVE_STATUSES,
+    EVIDENCE_RELATIONS,
+    GRAPH_SCHEMA,
+    INTERPRETATION_RELATIONS,
+    RECORD_STATUSES,
+    SCHEMA,
+    ReflectionGraphError,
+    build_reflection_graph,
+    create_reflection_record,
+    validate_reflection_graph,
+    validate_reflection_record,
+)
 from .validation import (
     ValidationError,
     validate_interpretation_record,
@@ -50,4 +63,15 @@ __all__ = [
     "validate_trace_events",
     "validate_interpretation_record",
     "validate_interpretation_records",
+    "SCHEMA",
+    "GRAPH_SCHEMA",
+    "RECORD_STATUSES",
+    "EFFECTIVE_STATUSES",
+    "EVIDENCE_RELATIONS",
+    "INTERPRETATION_RELATIONS",
+    "ReflectionGraphError",
+    "create_reflection_record",
+    "validate_reflection_record",
+    "validate_reflection_graph",
+    "build_reflection_graph",
 ]

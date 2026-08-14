@@ -1,0 +1,105 @@
+name: LiminalDB Durable Proof Source
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - rinse/adapters/liminaldb_durable_proof.py
+      - rinse/adapters/__init__.py
+      - tests/test_liminaldb_durable_proof_adapter.py
+      - docs/integrations/LIMINALDB_DURABLE_PROOF_SOURCE_V0_1.md
+      - .github/workflows/liminaldb-durable-proof-source.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: liminaldb-durable-proof-source-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EXACT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+      EXPECTED_PR_BASE: 6992c97290d3a1b58cd9a2ae506fd259babbb38e
+
+    steps:
+      - name: Checkout exact adapter head
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ env.EXACT_HEAD }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact head and canonical parent
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXACT_HEAD"
+          git merge-base --is-ancestor "$EXPECTED_PR_BASE" "$EXACT_HEAD"
+          if [ -n "$PR_BASE_SHA" ]; then test "$PR_BASE_SHA" = "$EXPECTED_PR_BASE"; fi
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile adapter and canonical reflection core
+        run: |
+          python -m py_compile \
+            rinse/adapters/liminaldb_durable_proof.py \
+            rinse/reflection_graph.py \
+            tests/test_liminaldb_durable_proof_adapter.py
+
+      - name: Run durable-source and reflection-core regressions
+        run: |
+          python -m unittest \
+            tests.test_liminaldb_durable_proof_adapter \
+            tests.test_reflection_graph \
+            -v
+
+      - name: Prove deterministic REFLECTION_ONLY projection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from tests.test_liminaldb_durable_proof_adapter import (
+              admission_bytes,
+              event_bytes,
+              summary,
+          )
+          from rinse.adapters.liminaldb_durable_proof import derive_durable_proof_reflection
+
+          event = event_bytes()
+          admission = admission_bytes()
+          source_summary = summary(event, admission)
+          first = derive_durable_proof_reflection(
+              source_summary,
+              event,
+              admission,
+              reviewed_time="2026-08-14T08:02:00Z",
+          )
+          second = derive_durable_proof_reflection(
+              source_summary,
+              event,
+              admission,
+              reviewed_time="2026-08-14T08:02:00Z",
+          )
+          assert first == second
+          assert first["graph"]["verdict"] == "ACCEPT_WITH_LIMITS"
+          assert first["reflection"]["authority"]["classification"] == "REFLECTION_ONLY"
+          assert first["reflection"]["authority"]["truth_authorized"] is False
+          assert first["reflection"]["authority"]["execution_authorized"] is False
+          assert all(
+              item["execution_allowed"] is False
+              for item in first["graph"]["candidate_handoffs"]
+          )
+          assert first["source_mutated"] is False
+          assert first["write_back_performed"] is False
+          print("RINSE_DURABLE_PROOF_SOURCE_PASS", first["reflection"]["digest"])
+          PY

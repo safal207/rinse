@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/safal207/rinse/schemas/reflection_graph.schema.json",
+  "title": "RINSE Reflection Graph Projection v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "verdict",
+    "nodes",
+    "edges",
+    "active_interpretation_ids",
+    "forked_predecessor_ids",
+    "candidate_handoffs",
+    "authority",
+    "digest"
+  ],
+  "properties": {
+    "schema": { "const": "rinse.reflection-graph.v0.2" },
+    "verdict": { "enum": ["ACCEPT", "ACCEPT_WITH_LIMITS", "REVIEW", "HOLD"] },
+    "nodes": { "type": "array", "items": { "type": "object" } },
+    "edges": { "type": "array", "items": { "type": "object" } },
+    "active_interpretation_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^rinse-reflection-[0-9a-f]{16}$" }
+    },
+    "forked_predecessor_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^rinse-reflection-[0-9a-f]{16}$" }
+    },
+    "candidate_handoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reflection_id", "kind", "target_state", "status", "execution_allowed"],
+        "properties": {
+          "reflection_id": { "type": "string", "pattern": "^rinse-reflection-[0-9a-f]{16}$" },
+          "kind": { "const": "REINTERPRETATION_CANDIDATE" },
+          "target_state": { "type": "string", "minLength": 1 },
+          "status": { "const": "CANDIDATE" },
+          "execution_allowed": { "const": false }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "source_trace_mutation_authorized",
+        "evidence_mutation_authorized",
+        "truth_authorized",
+        "execution_authorized"
+      ],
+      "properties": {
+        "classification": { "const": "REFLECTION_ONLY" },
+        "source_trace_mutation_authorized": { "const": false },
+        "evidence_mutation_authorized": { "const": false },
+        "truth_authorized": { "const": false },
+        "execution_authorized": { "const": false }
+      }
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

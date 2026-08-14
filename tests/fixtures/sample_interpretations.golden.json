@@ -3,7 +3,7 @@
     {
       "id": "<generated>",
       "source_trace_ids": ["trace-001"],
-      "emotions": ["sadness"],
+      "emotions": ["sadness", "avoidance"],
       "signals": ["incomplete_followthrough", "sleep_state"],
       "causal_links": [
         {
@@ -11,7 +11,7 @@
           "effect": "I keep starting projects and dropping them. I am tired today"
         }
       ],
-      "insight": "emotional tone: sadness; signals: incomplete_followthrough, sleep_state; pattern: I slept badly -> I keep starting projects and dropping them. I am tired today",
+      "insight": "emotional tone: sadness, avoidance; signals: incomplete_followthrough, sleep_state; pattern: I slept badly -> I keep starting projects and dropping them. I am tired today",
       "clarity": 1.0,
       "next_step": "write a one-line spec before starting the next project",
       "produced_at": "<generated>"
@@ -36,7 +36,7 @@
       "id": "<generated>",
       "source_trace_ids": ["trace-004"],
       "emotions": ["fear", "avoidance"],
-      "signals": ["deadline_pressure", "incomplete_followthrough"],
+      "signals": ["deadline_pressure"],
       "causal_links": [
         {
           "cause": "the deadline is close, so I avoid opening the editor",
@@ -47,7 +47,7 @@
           "effect": "I avoid opening the editor"
         }
       ],
-      "insight": "emotional tone: fear, avoidance; signals: deadline_pressure, incomplete_followthrough; pattern: the deadline is close, so I avoid opening the editor -> I am anxious",
+      "insight": "emotional tone: fear, avoidance; signals: deadline_pressure; pattern: the deadline is close, so I avoid opening the editor -> I am anxious",
       "clarity": 1.0,
       "next_step": "open the editor for ten minutes without a goal",
       "produced_at": "<generated>"

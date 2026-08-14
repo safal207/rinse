@@ -1,4 +1,4 @@
-"""Tests for the deterministic Career RINSE pipeline."""
+"""Tests for the deterministic Career RINSE domain adapter."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import copy
 import unittest
 
 from rinse.career import (
+    build_career_reflection_records,
     build_contact_queue,
     classify_evidence,
     normalize_career_event,
@@ -53,6 +54,77 @@ class CareerRinseTests(unittest.TestCase):
         trace["derived_from"] = ["t1"]
         event = normalize_career_event(trace)
         self.assertEqual(classify_evidence(event), "inferred")
+
+    def test_career_uses_shared_reflection_record_as_semantic_authority(self):
+        output = run_career_rinse(
+            [
+                _trace("t1", "assignment_received"),
+                _trace("t2", "interview_invited", occurred_at="2022-01-02T00:00:00Z"),
+            ]
+        )
+        record = output["reflection_records"][0]
+        projection = output["interpretations"][0]
+
+        self.assertEqual(record["schema"], "rinse.reflection-record.v0.2")
+        self.assertEqual(projection["id"], record["id"])
+        self.assertEqual(projection["reflection_record_id"], record["id"])
+        self.assertEqual(projection["semantic_authority"], record["schema"])
+        self.assertEqual(projection["status"], record["status"])
+        self.assertEqual(output["policy"]["interpretation_authority"], record["schema"])
+        self.assertTrue(output["policy"]["domain_projection_only"])
+
+    def test_unfinished_confirmed_process_is_supported_with_limits(self):
+        events = [
+            normalize_career_event(_trace("t1", "assignment_acknowledged")),
+            normalize_career_event(
+                _trace("t2", "interview_invited", occurred_at="2022-01-02T00:00:00Z")
+            ),
+        ]
+        record = build_career_reflection_records(events)[0]
+
+        self.assertEqual(record["status"], "SUPPORTED_WITH_LIMITS")
+        self.assertIn("final hiring outcome", record["missing_evidence"])
+        self.assertFalse(record["proposed_transition"]["execution_allowed"])
+        self.assertEqual(record["authority"]["classification"], "REFLECTION_ONLY")
+        self.assertFalse(record["authority"]["execution_authorized"])
+
+    def test_terminal_offer_is_supported_only_when_direct_offer_trace_exists(self):
+        events = [
+            normalize_career_event(_trace("t1", "interview_invited")),
+            normalize_career_event(
+                _trace("t2", "offer_received", occurred_at="2022-01-02T00:00:00Z")
+            ),
+        ]
+        record = build_career_reflection_records(events)[0]
+
+        self.assertEqual(record["status"], "SUPPORTED")
+        self.assertEqual(record["missing_evidence"], [])
+        self.assertIn("offer recorded", record["statement"])
+
+    def test_no_direct_support_is_insufficient_evidence(self):
+        trace = _trace("t1", "assignment_acknowledged")
+        trace["derived_from"] = ["source-t0"]
+        event = normalize_career_event(trace)
+        record = build_career_reflection_records([event])[0]
+
+        self.assertEqual(record["status"], "INSUFFICIENT_EVIDENCE")
+        self.assertIn("direct supporting career trace", record["missing_evidence"])
+        self.assertEqual(record["evidence_relations"], [])
+
+    def test_contradicted_group_uses_core_contested_semantics(self):
+        direct = normalize_career_event(_trace("t1", "positive_feedback"))
+        contradiction = _trace(
+            "t2", "positive_feedback", occurred_at="2022-01-02T00:00:00Z"
+        )
+        contradiction["contradicts"] = ["t1"]
+        record = build_career_reflection_records(
+            [direct, normalize_career_event(contradiction)]
+        )[0]
+
+        self.assertEqual(record["status"], "CONTESTED")
+        self.assertTrue(
+            any(rel["type"] == "CONTRADICTED_BY" for rel in record["evidence_relations"])
+        )
 
     def test_no_offer_claim_without_offer_trace(self):
         traces = [
